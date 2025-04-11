@@ -112,6 +112,20 @@
       margin-bottom: 1rem;
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
     }
+    #finalScore {
+      background: linear-gradient(to right, #06b6d4, #3b82f6);
+      color: white;
+      padding: 1rem;
+      border-radius: 12px;
+      font-size: 1.25rem;
+      text-align: center;
+      margin-bottom: 1rem;
+      animation: popIn 0.6s ease;
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
     @media (max-width: 600px) {
       .quiz-container {
         padding: 1rem;
@@ -128,6 +142,7 @@
     <div id="progressContainer">
       <div id="progressBar"></div>
     </div>
+    <div id="finalScore"></div>
     <h2 id="question">Loading...</h2>
     <div id="options"></div>
     <div id="navigation">
@@ -152,6 +167,7 @@
     const restartBtn = document.getElementById('restartBtn');
     const summaryEl = document.getElementById('summary');
     const progressBar = document.getElementById('progressBar');
+    const finalScoreEl = document.getElementById('finalScore');
 
     function shuffleArray(array) {
       return array.sort(() => Math.random() - 0.5);
@@ -168,6 +184,7 @@
     }
 
     function loadQuestion() {
+      finalScoreEl.innerHTML = '';
       const current = quizData[currentIndex];
       questionEl.textContent = `Q${currentIndex + 1}: ${current.question}`;
       optionsEl.innerHTML = '';
@@ -236,6 +253,7 @@
       currentIndex = 0;
       userAnswers = Array(quizData.length).fill(null);
       summaryEl.innerHTML = '';
+      finalScoreEl.innerHTML = '';
       loadQuestion();
     };
 
@@ -249,7 +267,7 @@
         Your Answer: <span style="color:${isCorrect ? 'green' : 'red'}">${userAnswers[i]}</span><br>
         Correct Answer: ${q.answer}</p>`;
       });
-      resultHTML += `<p><strong>Your Final Score: ${score} / ${quizData.length}</strong></p>`;
+      finalScoreEl.innerHTML = `Your Final Score: ${score} / ${quizData.length}`;
       summaryEl.innerHTML = resultHTML;
     }
 
