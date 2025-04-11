@@ -13,11 +13,12 @@
       justify-content: center;
       min-height: 100vh;
       margin: 0;
-      background: linear-gradient(135deg, #c3ecf8, #f5f7fa);
+      background: url('https://images.unsplash.com/photo-1532877590696-69a7b7e60490?auto=format&fit=crop&w=1950&q=80') no-repeat center center fixed;
+      background-size: cover;
       padding: 1rem;
     }
     .quiz-container {
-      background: #ffffff;
+      background: rgba(255, 255, 255, 0.95);
       padding: 2rem;
       border-radius: 20px;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
@@ -34,6 +35,20 @@
     h2 {
       margin-bottom: 1rem;
       color: #1e293b;
+    }
+    #progressContainer {
+      width: 100%;
+      height: 10px;
+      background-color: #e2e8f0;
+      border-radius: 5px;
+      margin-bottom: 1rem;
+      overflow: hidden;
+    }
+    #progressBar {
+      height: 100%;
+      width: 0%;
+      background-color: #3b82f6;
+      transition: width 0.4s ease;
     }
     .option {
       background: #e2e8f0;
@@ -56,14 +71,28 @@
       padding: 0.6rem 1.2rem;
       border: none;
       border-radius: 10px;
-      background: #6366f1;
       color: white;
       font-weight: 600;
       cursor: pointer;
       transition: background 0.3s;
     }
-    button:hover {
+    #prevBtn, #nextBtn {
+      background: #6366f1;
+    }
+    #prevBtn:hover, #nextBtn:hover {
       background: #4f46e5;
+    }
+    #submitBtn {
+      background: #10b981;
+    }
+    #submitBtn:hover {
+      background: #059669;
+    }
+    #restartBtn {
+      background: #f59e0b;
+    }
+    #restartBtn:hover {
+      background: #d97706;
     }
     #navigation {
       margin-top: 1rem;
@@ -95,6 +124,9 @@
 </head>
 <body>
   <div class="quiz-container">
+    <div id="progressContainer">
+      <div id="progressBar"></div>
+    </div>
     <h2 id="question">Loading...</h2>
     <div id="options"></div>
     <div id="navigation">
@@ -125,9 +157,15 @@
     const submitBtn = document.getElementById('submitBtn');
     const restartBtn = document.getElementById('restartBtn');
     const summaryEl = document.getElementById('summary');
+    const progressBar = document.getElementById('progressBar');
 
     function shuffleArray(array) {
       return array.sort(() => Math.random() - 0.5);
+    }
+
+    function updateProgressBar() {
+      const progress = ((currentIndex) / quizData.length) * 100;
+      progressBar.style.width = `${progress}%`;
     }
 
     function loadQuestion() {
@@ -147,6 +185,7 @@
 
       prevBtn.disabled = currentIndex === 0;
       nextBtn.disabled = currentIndex === quizData.length - 1;
+      updateProgressBar();
     }
 
     function selectOption(selectedDiv, value) {
@@ -176,8 +215,9 @@
     };
 
     submitBtn.onclick = () => {
-      if (userAnswers.includes(null)) {
-        alert('Please answer all questions before submitting.');
+      const unanswered = userAnswers.map((ans, idx) => ans === null ? idx + 1 : null).filter(n => n !== null);
+      if (unanswered.length > 0) {
+        alert('Please answer all questions before submitting.\nMissing question numbers: ' + unanswered.join(', '));
         return;
       }
       showResults();
