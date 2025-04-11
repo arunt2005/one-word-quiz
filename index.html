@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>One-Word Quiz</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -13,7 +14,7 @@
       justify-content: center;
       min-height: 100vh;
       margin: 0;
-      background: url('https://images.unsplash.com/photo-1532877590696-69a7b7e60490?auto=format&fit=crop&w=1950&q=80') no-repeat center center fixed;
+      background: url('https://source.unsplash.com/featured/?quiz,background') no-repeat center center fixed;
       background-size: cover;
       padding: 1rem;
     }
@@ -83,16 +84,16 @@
       background: #4f46e5;
     }
     #submitBtn {
-      background: #10b981;
+      background: #22c55e;
     }
     #submitBtn:hover {
-      background: #059669;
+      background: #16a34a;
     }
     #restartBtn {
-      background: #f59e0b;
+      background: #f97316;
     }
     #restartBtn:hover {
-      background: #d97706;
+      background: #ea580c;
     }
     #navigation {
       margin-top: 1rem;
@@ -139,16 +140,9 @@
   </div>
 
   <script>
-    let quizData = [
-      { question: "Bright", options: ["Dark", "Shiny", "Heavy", "Cold"], answer: "Shiny" },
-      { question: "Strong", options: ["Weak", "Soft", "Powerful", "Thin"], answer: "Powerful" },
-      { question: "Happy", options: ["Sad", "Joyful", "Loud", "Sleepy"], answer: "Joyful" },
-      { question: "Begin", options: ["End", "Start", "Close", "Late"], answer: "Start" },
-      { question: "Fast", options: ["Quick", "Slow", "Long", "Tiny"], answer: "Quick" }
-    ];
-
+    let quizData = [];
     let currentIndex = 0;
-    let userAnswers = Array(quizData.length).fill(null);
+    let userAnswers = [];
 
     const questionEl = document.getElementById('question');
     const optionsEl = document.getElementById('options');
@@ -164,8 +158,13 @@
     }
 
     function updateProgressBar() {
-      const progress = ((currentIndex) / quizData.length) * 100;
+      const answeredCount = userAnswers.filter(a => a !== null).length;
+      const progress = (answeredCount / quizData.length) * 100;
       progressBar.style.width = `${progress}%`;
+    }
+
+    function scrollToSummary() {
+      document.getElementById('summary').scrollIntoView({ behavior: 'smooth' });
     }
 
     function loadQuestion() {
@@ -192,6 +191,13 @@
       userAnswers[currentIndex] = value;
       Array.from(document.querySelectorAll('.option')).forEach(opt => opt.classList.remove('selected'));
       selectedDiv.classList.add('selected');
+      updateProgressBar();
+
+      if (userAnswers.every(ans => ans !== null)) {
+        progressBar.style.width = '100%';
+        setTimeout(() => scrollToSummary(), 400);
+      }
+
       setTimeout(() => {
         if (currentIndex < quizData.length - 1) {
           currentIndex++;
@@ -220,7 +226,9 @@
         alert('Please answer all questions before submitting.\nMissing question numbers: ' + unanswered.join(', '));
         return;
       }
+      progressBar.style.width = '100%';
       showResults();
+      scrollToSummary();
     };
 
     restartBtn.onclick = () => {
@@ -245,8 +253,28 @@
       summaryEl.innerHTML = resultHTML;
     }
 
-    quizData = shuffleArray(quizData);
-    loadQuestion();
+    window.onload = function() {
+      const path = 'C:/Users/ADMIN/Documents/one-word-quiz/Quiz_QA.xlsx';
+      fetch(path)
+        .then(response => response.arrayBuffer())
+        .then(data => {
+          const workbook = XLSX.read(data, { type: 'array' });
+          const sheet = workbook.Sheets[workbook.SheetNames[0]];
+          const rows = XLSX.utils.sheet_to_json(sheet);
+
+          quizData = rows.map(row => ({
+            question: row.Question,
+            options: [row.Option1, row.Option2, row.Option3, row.Option4],
+            answer: row.Answer
+          }));
+
+          quizData = shuffleArray(quizData);
+          currentIndex = 0;
+          userAnswers = Array(quizData.length).fill(null);
+          loadQuestion();
+        })
+        .catch(err => alert('Failed to load Excel file. Make sure the file path is correct and accessible.'));
+    };
   </script>
 </body>
 </html>
