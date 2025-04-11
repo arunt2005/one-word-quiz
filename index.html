@@ -298,7 +298,8 @@
         Your Answer: <span style="color:${isCorrect ? 'green' : 'red'}">${userAnswers[i]}</span><br>
         Correct Answer: ${q.answer}</p>`;
       });
-      resultHTML += `<div id="finalScore">Your Final Score: ${score} / ${quizData.length}</div>`;
+      // resultHTML += `<div id="finalScore">Your Final Score: ${score} / ${quizData.length}</div>`;
+	  resultHTML = `<div id="finalScore">Your Final Score: ${score} / ${quizData.length}</div>` + resultHTML;
       summaryEl.innerHTML = resultHTML;
     }
 
