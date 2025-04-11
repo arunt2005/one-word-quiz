@@ -120,6 +120,7 @@
       font-size: 1.5rem;
       font-weight: bold;
       text-align: center;
+      margin-top: 1rem;
       margin-bottom: 1rem;
       animation: popIn 0.6s ease;
     }
@@ -143,7 +144,6 @@
     <div id="progressContainer">
       <div id="progressBar"></div>
     </div>
-    <div id="finalScore"></div>
     <h2 id="question">Loading...</h2>
     <div id="options"></div>
     <div id="navigation">
@@ -153,6 +153,7 @@
     </div>
     <button id="restartBtn">Restart</button>
     <div id="summary"></div>
+    <div id="finalScore"></div>
   </div>
 
   <script>
@@ -268,7 +269,7 @@
         Your Answer: <span style="color:${isCorrect ? 'green' : 'red'}">${userAnswers[i]}</span><br>
         Correct Answer: ${q.answer}</p>`;
       });
-      finalScoreEl.innerHTML = `Your Final Score: ${score} / ${quizData.length}`;
+      resultHTML += `<div id="finalScore">Your Final Score: ${score} / ${quizData.length}</div>`;
       summaryEl.innerHTML = resultHTML;
     }
 
